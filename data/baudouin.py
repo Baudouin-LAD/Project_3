@@ -6,12 +6,21 @@ Created on Mon Feb 13 09:31:29 2023
 @author: Baudouin
 """
 
+import seaborn as sns
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+import statsmodels.api as sm
+from sklearn.linear_model import LinearRegression
+from typing import List, Optional
+from scipy import stats
 
 data = pd.read_csv('/Users/Baudouin/Ironhack/Project_4/data/crimedata.csv')
 states= pd.read_excel('/Users/Baudouin/Ironhack/Project_4/State_codes.xlsx')
 data = pd.merge(left=states, right=data, left_on='Alpha code', right_on='state')
-
+data["violent_crimes"] = data["murders"] +  data["rapes"] + data["robberies"] + data["assaults"]
+data["other_crimes"] = data["arsons"] +  data["autoTheft"] + data["burglaries"] + data["larcenies"]
 target_vars = ["population","murders",
 "rapes",
 "robberies",
@@ -35,5 +44,63 @@ def select_sample(category,data):
         print('invalid argument please select best or worst')
     return result
 
+#Statistics
+def indice(data,target: List[str]):
+    weights=[]
+    n=O
+    d=pd.DataFrame()
+    for i in range (len(target)):
+        j=input('what weight would you like to put on {target[i]}')
+        n+=j
+        weights.append(j)
+    for w in range(len(weights)):
+        d[str(w)]=data[target[w]]*weight[w]
+    data['indice']=d.sum(axis=1)/n
+    return[data,target]
 
-r=select_sample('best',data)
+        
+def slicing(data,crime_type:str,states: List[str],target: List[str],Xaxis:Optional[str]=None,Yaxis:Optional[str]=None):
+    if crime_type == 'violent':
+        target.append('violent_crimes')
+        if len(states) == 0:
+            result=data.loc[:,target]
+        else: 
+            target.append('state')
+            result=data.loc[data['state'].isin(states),target]
+    if crime_type == 'other':
+        target.append('other_crimes')
+        if len(states) == 0:
+            result=data.loc[:,target]
+        else: 
+            target.append('state')
+            result=data.loc[data['state'].isin(states),target]
+    return result.reset_index().drop('index',axis=1)
+            
+
+r=slicing(data,'other',['IL','FL','DC'],['PctKids2Par','PctTeen2Par'])   
+
+def regress(data,crime_type:Optional[str]=None,states: Optional[List[str]]=None,target: Optional[List[str]]=None,Xaxis:Optional[str]=None,Yaxis:Optional[str]=None):
+    if len(target)>1:
+        data=indice(data,target)[0]
+        scipy.stats.pearsonr(data.iloc[:,-2], constants )
+        
+        result = [data,crime_type,states,target,data.iloc[:,-2],data['indice']]
+    return result
+  
+            
+            
+   
+   
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
