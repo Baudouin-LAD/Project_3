@@ -16,17 +16,23 @@ def boxplot(ax, data : pd.DataFrame,  xtitle : Optional[str] = None ):
     sns.boxplot(data=data, ax=ax)
     return ax
 
-def scatterplot(ax, df, xcol, ycol):
-    ax.scatter(x=df[xcol],y=df[ycol])
+def scatterplot(ax, data, xcol, ycol):
+    ax.scatter(x=data[xcol],y=data[ycol])
     return ax
 
 def histogram(ax,values, nbins=10):
     ax.hist(values, nbins=nbins)
     return ax
 
-def pie_chart(ax,df, colname):
-    df.plot.pie(y=colname,ax=ax)
-    return ax
+def pie_chart(data, categories, ycol=None):
+    plot_data = data.loc[:,categories].reset_index(drop=False)
+    plot_data= plot_data.T
+    colnames = plot_data.iloc[0]
+    plot_data.rename(columns=colnames,inplace=True)
+    plot_data =plot_data.iloc[1:,:]
+    axes = plot_data.plot.pie(subplots=True)
+    return axes
+
 
 def scatterplot_sns(ax : plt.Axes, data: pd.DataFrame, xcol:str, ycol:str, hue_col : Optional[str] = None):
     sns.scatterplot(data=data, x=xcol, y=ycol, hue=hue_col, ax=ax)
@@ -49,9 +55,10 @@ def heatmeap_sns(ax : plt.Axes, data: pd.DataFrame, mask=True, vmax=1, vmin=-1):
 def barplot_pcat(ax, data: pd.DataFrame, xlevel:str, hue_vars:str ):
     dfm = data.reset_index(drop=False)
     list_colnames = []
-    list_colnames.append(str)
+    list_colnames.append(xlevel)
     list_colnames.extend(hue_vars)
     dfm = dfm.loc[:, list_colnames]
     dfm = dfm.melt(id_vars=xlevel)
     sns.barplot(data=dfm, x=xlevel, y='value', hue="variable",ax=ax)
     return ax
+
