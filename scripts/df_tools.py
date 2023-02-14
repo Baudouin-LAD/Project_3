@@ -34,6 +34,22 @@ def other_crimes(data):
     data["other_crimes"] = data["arsons"] + data["autoTheft"] + data["burglaries"] + data["larcenies"]
     return data
 
+def check_outlier_IQR(data, column_name):
+    ## Let's find out the outliers in `nonViolPerPop` response variable and plot those to find cities with highest crime rate in the US
+    quartile_1, quartile_3 = np.percentile(data[column_name].dropna(), [25, 75])
+    iqr = quartile_3 - quartile_1
+    lower_bound = quartile_1 - (iqr * 1.5)
+    upper_bound = quartile_3 + (iqr * 1.5)
+    return data[(data[column_name]>upper_bound)|(data[column_name]<lower_bound)]
+    
+def check_outlier_upperIQR(data, column_name):
+    ## Let's find out the outliers in `nonViolPerPop` response variable and plot those to find cities with highest crime rate in the US
+    quartile_1, quartile_3 = np.percentile(data[column_name].dropna(), [25, 75])
+    iqr = quartile_3 - quartile_1
+    lower_bound = quartile_1 - (iqr * 1.5)
+    upper_bound = quartile_3 + (iqr * 1.5)
+    return data[data[column_name]>upper_bound]
+    
 def select_sample(category,data,indexcol:str, rankedcol = str, aggfunc="sum"):
     if category=='best':
         result=data.nsmallest(5,rankedcol)
